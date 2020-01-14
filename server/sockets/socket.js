@@ -20,14 +20,16 @@ io.on('connection', (client) => {
 
 				// * emitiendo mensaje por sala
         client.broadcast.to(data.sala).emit('listaPersonas',usuarios.getPersonaPorSala(data.sala));
+        client.broadcast.to(data.sala).emit('crearMensaje', crearMensaje( 'Administrador', `${data.nombre} se unio el chat`));
         callback(usuarios.getPersonaPorSala(data.sala));
         
     });
 
-    client.on('crearMensaje',(data) => {
+    client.on('crearMensaje',(data,callback) => {
         let persona = usuarios.getPersona(client.id);
         let mensaje = crearMensaje(persona.nombre, data.mensaje);
         client.broadcast.to(persona.sala).emit('crearMensaje',mensaje);
+        callback(mensaje)
     });
 
     client.on('disconnect',() =>{
@@ -40,6 +42,7 @@ io.on('connection', (client) => {
         // *Mensaje Privado
         let persona = usuarios.getPersona(client.id);
         client.broadcast.to(data.para).emit('mensajePrivado', crearMensaje(persona.nombre, data.mensaje));
+        
     });
 
 });
